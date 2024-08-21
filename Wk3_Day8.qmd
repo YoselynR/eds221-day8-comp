@@ -1,0 +1,171 @@
+---
+title: "Wk3_Day8"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#install packages and # them out after because I run all when I clean the environment
+#install.packages("patchwork")
+#install.packages("ggrepel")
+#install.packages("gghighlight")
+#install.packages("paletteer")
+#install.packages("ggExtra")
+#install.packages("ggbeeswarm")
+
+```
+
+```{r}
+#attach libraries
+library(tidyverse)
+library(here)
+library(janitor)
+library(patchwork)
+library(ggrepel)
+library(gghighlight)
+library(paletteer)
+library(ggExtra)
+library(ggbeeswarm)
+```
+
+```{r}
+lizards<-read_csv(here("data_tidy","lizards.csv"))
+```
+
+```{r}
+#data and axis in plot (added 2 geometries)
+ggplot(lizards, aes(x=total_length,y=weight)) +
+  geom_point()+
+  geom_line()
+#data in plot, axis in geom
+ggplot(lizards)+
+  geom_point(aes(x=total_length,y=weight))
+#data and axis in geom
+ggplot()+
+  geom_point(data=lizards,aes(x=total_length,y=weight))
+
+```
+
+```{r}
+#one axis
+ggplot(data = lizards,aes(x=total_length))+
+  geom_histogram()
+```
+
+```{r}
+#one continuous one categorical
+ggplot(lizards,aes(y=common_name,x=weight))+
+  geom_jitter()
+#harder to see how many points
+ggplot(lizards,aes(y=common_name,x=weight))+
+  geom_point()
+```
+
+```{r}
+ggplot(lizards,aes(x=weight))+
+  geom_histogram(color="yellow",fill="pink",size=2,linetype="dotted")
+```
+
+```{r}
+#alpha is transparency
+ggplot(lizards,aes(x=total_length,y=weight))+
+  geom_point(color="#FECEE9",
+             fill="#EB9FEF",
+             shape=22,
+             size=10,
+             alpha=0.2)
+#color and size are variables
+ggplot(lizards,aes(x=total_length,y=weight))+
+  geom_point(aes(color=common_name,
+                 size = total_length),
+             alpha=0.5)
+#same as above with scale color palette (parentheses can be left empty)
+ggplot(lizards,aes(x=total_length,y=weight))+
+  geom_point(aes(color=common_name,
+                 size = total_length),
+             alpha=0.5)+
+  scale_color_brewer(palette = "Set3")
+#different color palette
+ggplot(lizards,aes(x=total_length,y=weight))+
+  geom_point(aes(color=common_name,
+                 size = total_length),
+             alpha=0.5)+
+  scale_color_discrete(type = c("pink4","blue4","orange4","yellow4","purple4","red4","grey4"))
+```
+
+```{r}
+#themes for the background and outline
+ggplot(lizards,aes(x=site,y=weight))+
+  geom_jitter(aes(color=common_name))+
+  theme_minimal()
+#theme for the background and outline
+ggplot(lizards,aes(x=site,y=weight))+
+  geom_jitter(aes(color=common_name))+
+  theme_bw()
+#theme for the background and outline
+ggplot(lizards,aes(x=site,y=weight))+
+  geom_jitter(aes(color=common_name))+
+  theme_light()
+```
+
+```{r}
+#labels
+ggplot(lizards,aes(x=total_length,y=weight))+
+  geom_point()+
+  labs(x="Total length (mm)",
+       y="Weight (grams)",
+       title="Lizard size")
+```
+
+```{r}
+#facet wrap with scales free for different axis
+ggplot(lizards,aes(x=total_length,y=weight))+
+  geom_point()+
+  facet_wrap(~common_name,ncol = 3,scales = "free")+
+  labs(x="Total length (mm)",
+       y="Weight (grams)",
+       title="Lizard size")
+
+```
+
+```{r}
+#facet grid
+ggplot(lizards,aes(x=total_length,y=weight))+
+  geom_point()+
+  facet_grid(sex~tail)
+```
+
+```{r}
+lizards_counts<-lizards%>%
+  count(common_name)
+#factor reorder
+ggplot(lizards_counts,aes(y=fct_reorder(common_name,n),x=n))+
+  geom_col()
+```
+
+```{r}
+#color and shape with theme, labels, and facet wrap (shape ran out)
+ggplot(lizards,aes(x=total_length,y=weight))+
+  geom_point(aes(color=common_name,shape = common_name),
+             size=2)+
+  theme_minimal()+
+  labs(x="Total length (mm)",
+       y="Weight (g)",
+       color="Lizard species",
+       shape="Lizard species")+
+  facet_wrap(~common_name,scales = "free")
+
+```
+
+```{r}
+#factor by infrequent, one axis and facet grid
+ggplot(lizards,aes(y=fct_infreq(common_name)))+
+  geom_bar(aes(fill = site))+
+  theme_minimal()+
+  labs(x="Lizard counts",
+       y="Species (common name)")+
+  facet_grid(sex~tail)
+```
+
